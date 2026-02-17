@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aueik | Enterprise AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+      :root {
+        /* Light Theme (Default) */
+        --bg-base: #FFFFFF;
+        --bg-surface: #F9F9FB;
+        --bg-panel: #FFFFFF;
+        --text-contrast: #09090B;
+        --text-muted: #71717A;
+        --border-color: rgba(0, 0, 0, 0.08);
+        --border-strong: rgba(0, 0, 0, 0.15);
+        --pattern-stroke: rgba(0, 0, 0, 1);
+        --logo-text: #09090B;
+        
+        /* Transition Coordinates (Default to center) */
+        --x: 50%;
+        --y: 50%;
+      }
+
+      html.dark {
+        /* Dark Theme */
+        --bg-base: #000000;
+        --bg-surface: #0B0B0B;
+        --bg-panel: #0F0F0F;
+        --text-contrast: #FFFFFF;
+        --text-muted: #A1A1A1;
+        --border-color: rgba(255, 255, 255, 0.12);
+        --border-strong: rgba(255, 255, 255, 0.20);
+        --pattern-stroke: rgba(255, 255, 255, 1);
+        --logo-text: #FFFFFF;
+      }
+
+      body {
+        background-color: var(--bg-base);
+        color: var(--text-contrast);
+        font-family: 'Satoshi', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 0s, color 0s;
+      }
+
+      /* --- Soft View Transition Config --- */
+
+      /* Define custom property for smooth gradient animation */
+      @property --r {
+        syntax: '<percentage>';
+        inherits: false;
+        initial-value: 0%;
+      }
+
+      ::view-transition-group(root) {
+        animation-duration: 1.5s; /* Luxurious slow speed */
+      }
+
+      /* OLD VIEW: Recedes with depth */
+      ::view-transition-old(root) {
+        z-index: 1;
+        transform-origin: var(--x) var(--y);
+        animation: 1.5s cubic-bezier(0.22, 1, 0.36, 1) both fade-out-scale;
+      }
+
+      /* NEW VIEW: Distinct soft-edged circle */
+      ::view-transition-new(root) {
+        z-index: 9999;
+        mix-blend-mode: normal;
+        
+        /* 
+           Gradient Mask:
+           starts black (visible) at var(--r)
+           fades to transparent at var(--r) + 15%
+           This creates a clearly defined circle that still has a soft, smooth edge.
+        */
+        mask-image: radial-gradient(
+          circle at var(--x) var(--y),
+          black var(--r), 
+          transparent calc(var(--r) + 15%)
+        );
+        -webkit-mask-image: radial-gradient(
+          circle at var(--x) var(--y),
+          black var(--r), 
+          transparent calc(var(--r) + 15%)
+        );
+        
+        /* Quart Out Easing: Fast start, extremely smooth deceleration */
+        animation: 1.5s cubic-bezier(0.25, 1, 0.5, 1) both reveal-circle;
+      }
+
+      /* Animation Keyframes */
+      @keyframes reveal-circle {
+        from { --r: 0%; }
+        to { --r: 150%; }
+      }
+
+      @keyframes fade-out-scale {
+        0% { 
+            opacity: 1; 
+            transform: scale(1); 
+            filter: blur(0px); 
+        }
+        100% { 
+            opacity: 0; 
+            transform: scale(0.96); 
+            filter: blur(8px); /* Subtle blur to enhance depth */
+        } 
+      }
+
+      /* Fallback for browsers that don't support @property (Hard Clip) */
+      @supports not (background: paint(something)) {
+        ::view-transition-new(root) {
+          mask-image: none;
+          -webkit-mask-image: none;
+          clip-path: circle(0% at var(--x) var(--y));
+          animation: 1.5s cubic-bezier(0.25, 1, 0.5, 1) both reveal-hard;
+        }
+        
+        ::view-transition-old(root) {
+          animation: none;
+          opacity: 1;
+        }
+        
+        @keyframes reveal-hard {
+          from { clip-path: circle(0% at var(--x) var(--y)); }
+          to { clip-path: circle(150% at var(--x) var(--y)); }
+        }
+      }
+
+      /* Custom scrollbar */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.02);
+      }
+      .dark .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+      }
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                base: 'var(--bg-base)',
+                surface: 'var(--bg-surface)',
+                panel: 'var(--bg-panel)',
+                contrast: 'var(--text-contrast)',
+                muted: 'var(--text-muted)',
+                peach: '#F4A261',
+                peachHover: '#E08E50',
+                border: 'var(--border-color)',
+                borderStrong: 'var(--border-strong)',
+                glow: 'rgba(244, 162, 97, 0.25)'
+              }
+            },
+            fontFamily: {
+              sans: ['Satoshi', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            backgroundImage: {
+              'noise': "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAlJyBoZWlnaHQ9JzIwMCUnPjxmaWx0ZXIgaWQ9J25vaXNlJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44JyBudW1PY3RhdmVzPSczJyBzdGl0Y2hUaWxlcz0nc3RpdGNoJy8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsdGVyPSd1cmwoI25vaXNlKScgb3BhY2l0eT0nMC4wOCcgb3BhY2l0eT0nMC40Jy8+PC9zdmc+')",
+            },
+            letterSpacing: {
+              tighter: '-0.04em',
+              tight: '-0.02em',
+              widest: '0.15em',
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.564.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react-dom": "https://esm.sh/react-dom@^19.2.4"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
